@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>B2 Deutsch Wort-Challenge</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    color: #222;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 700px;
+    margin: auto;
+    padding: 25px 18px 50px;
+}
+
+/* HEADER */
+
+header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+header h1 {
+    font-size: 30px;
+    margin-bottom: 8px;
+}
+
+header p {
+    color: #666;
+}
+
+/* SCORE */
+
+.stats {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.stat {
+    flex: 1;
+    background: white;
+    padding: 14px;
+    border-radius: 14px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+
+.stat strong {
+    display: block;
+    font-size: 22px;
+    margin-top: 4px;
+}
+
+/* CARD */
+
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.level {
+    display: inline-block;
+    background: #222;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    margin-bottom: 15px;
+}
+
+.word {
+    font-size: 38px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.example {
+    background: #f2f2f2;
+    padding: 15px;
+    border-radius: 12px;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.question {
+    font-size: 19px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* OPTIONS */
+
+.option {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    background: white;
+    text-align: left;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.option:hover {
+    border-color: #222;
+}
+
+.option.correct {
+    border-color: #249b4b;
+    background: #eaf8ef;
+}
+
+.option.wrong {
+    border-color: #d33;
+    background: #fff0f0;
+}
+
+/* BUTTON */
+
+button {
+    font-family: inherit;
+}
+
+.main-btn {
+    width: 100%;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    background: #222;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.main-btn:hover {
+    opacity: 0.85;
+}
+
+/* SENTENCE */
+
+textarea {
+    width: 100%;
+    min-height: 120px;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    padding: 15px;
+    font-size: 16px;
+    resize: vertical;
+    margin-top: 10px;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #222;
+}
+
+/* FEEDBACK */
+
+.feedback {
+    margin-top: 20px;
+    padding: 18px;
+    border-radius: 14px;
+    line-height: 1.6;
+}
+
+.feedback.good {
+    background: #eaf8ef;
+    border-left: 5px solid #249b4b;
+}
+
+.feedback.medium {
+    background: #fff8df;
+    border-left: 5px solid #d8a800;
+}
+
+.feedback.bad {
+    background: #fff0f0;
+    border-left: 5px solid #d33;
+}
+
+.hidden {
+    display: none;
+}
+
+/* PROGRESS */
+
+.progress-container {
+    background: #ddd;
+    height: 10px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    width: 0%;
+    background: #222;
+    transition: width 0.3s;
+}
+
+/* MOBILE */
+
+@media (max-width: 500px) {
+
+    header h1 {
+        font-size: 25px;
+    }
+
+    .word {
+        font-size: 30px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+    <h1>🇩🇪 B2 Wort-Challenge</h1>
+    <p>Teste dein Deutsch. Ein Wort nach dem anderen.</p>
+</header>
+
+<!-- STATS -->
+
+<div class="stats">
+
+    <div class="stat">
+        🏆 Score
+        <strong id="score">0</strong>
+    </div>
+
+    <div class="stat">
+        🔥 Streak
+        <strong id="streak">0</strong>
+    </div>
+
+    <div class="stat">
+        📚 Wort
+        <strong id="wordNumber">1</strong>
+    </div>
+
+</div>
+
+<div class="progress-container">
+    <div class="progress" id="progress"></div>
+</div>
+
+
+<!-- WORD CARD -->
+
+<div class="card">
+
+    <span class="level">B2</span>
+
+    <div class="word" id="word">
+        die Voraussetzung
+    </div>
+
+    <div class="example">
+        🇩🇪
+        <span id="example">
+            Gute Deutschkenntnisse sind eine wichtige Voraussetzung für diese Stelle.
+        </span>
+    </div>
+
+    <div class="question">
+        Was bedeutet dieses Wort?
+    </div>
+
+    <div id="options"></div>
+
+</div>
+
+
+<!-- SENTENCE CARD -->
+
+<div class="card hidden" id="sentenceCard">
+
+    <div class="question">
+        ✍️ Jetzt bist du dran!
+    </div>
+
+    <p>
+        Schreibe einen eigenen Satz mit:
+    </p>
+
+    <br>
+
+    <strong id="sentenceWord"></strong>
+
+    <textarea
+        id="userSentence"
+        placeholder="Schreib deinen deutschen Satz hier..."
+    ></textarea>
+
+    <button class="main-btn" onclick="checkSentence()">
+        Prüfen
+    </button>
+
+    <div id="feedback"></div>
+
+    <button
+        class="main-btn hidden"
+        id="nextButton"
+        onclick="nextWord()"
+    >
+        Nächstes Wort →
+    </button>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ==========================================
+   VOCABULARY DATABASE
+========================================== */
+
+const vocabulary = [
+
+{
+    word: "die Voraussetzung",
+    example: "Gute Deutschkenntnisse sind eine wichtige Voraussetzung für diese Stelle.",
+    answer: "Persyaratan / syarat",
+    options: [
+        "Keputusan",
+        "Persyaratan / syarat",
+        "Pengalaman",
+        "Kesempatan"
+    ],
+    explanation:
+        "„Voraussetzung“ bedeutet eine Bedingung, die erfüllt sein muss, bevor etwas möglich ist.",
+    structure:
+        "Typische Struktur: „eine Voraussetzung für etwas sein“."
+},
+
+{
+    word: "die Herausforderung",
+    example: "Das Lernen einer neuen Sprache kann eine große Herausforderung sein.",
+    answer: "Tantangan",
+    options: [
+        "Tantangan",
+        "Keberhasilan",
+        "Perubahan",
+        "Kebiasaan"
+    ],
+    explanation:
+        "„Herausforderung“ bezeichnet eine schwierige Aufgabe oder Situation, die besondere Anstrengung erfordert.",
+    structure:
+        "Typische Verbindung: „eine große Herausforderung sein“."
+},
+
+{
+    word: "die Auswirkung",
+    example: "Der Klimawandel hat große Auswirkungen auf unsere Umwelt.",
+    answer: "Dampak / pengaruh",
+    options: [
+        "Dampak / pengaruh",
+        "Tujuan",
+        "Peraturan",
+        "Perbedaan"
+    ],
+    explanation:
+        "„Auswirkung“ bedeutet die Folge oder der Einfluss, den etwas auf etwas anderes hat.",
+    structure:
+        "Typisch: „Auswirkungen auf + Akkusativ“."
+},
+
+{
+    word: "bewältigen",
+    example: "Sie konnte die schwierige Situation erfolgreich bewältigen.",
+    answer: "Mengatasi",
+    options: [
+        "Menghindari",
+        "Mengatasi",
+        "Menjelaskan",
+        "Membandingkan"
+    ],
+    explanation:
+        "„bewältigen“ bedeutet, eine schwierige Aufgabe oder Situation erfolgreich zu lösen.",
+    structure:
+        "Beispiel: „eine schwierige Situation bewältigen“."
+},
+
+{
+    word: "nachhaltig",
+    example: "Wir müssen nachhaltiger mit unseren Ressourcen umgehen.",
+    answer: "Berkelanjutan",
+    options: [
+        "Sementara",
+        "Berkelanjutan",
+        "Berbahaya",
+        "Sederhana"
+    ],
+    explanation:
+        "„nachhaltig“ beschreibt etwas, das langfristig wirkt und Ressourcen nicht unnötig verbraucht.",
+    structure:
+        "Typisch: „nachhaltige Entwicklung“, „nachhaltig handeln“."
+},
+
+{
+    word: "berücksichtigen",
+    example: "Bei der Entscheidung müssen wir alle wichtigen Faktoren berücksichtigen.",
+    answer: "Mempertimbangkan",
+    options: [
+        "Mempertimbangkan",
+        "Menghapus",
+        "Menolak",
+        "Mengabaikan"
+    ],
+    explanation:
+        "„berücksichtigen“ bedeutet, etwas bei einer Entscheidung oder Überlegung miteinzubeziehen.",
+    structure:
+        "Beispiel: „alle Faktoren berücksichtigen“."
+},
+
+{
+    word: "die Maßnahme",
+    example: "Die Regierung plant neue Maßnahmen zum Schutz der Umwelt.",
+    answer: "Tindakan / langkah",
+    options: [
+        "Masalah",
+        "Tindakan / langkah",
+        "Kesalahan",
+        "Pendapat"
+    ],
+    explanation:
+        "Eine „Maßnahme“ ist eine konkrete Handlung, die gemacht wird, um ein bestimmtes Ziel zu erreichen.",
+    structure:
+        "Typisch: „Maßnahmen gegen etwas“ oder „Maßnahmen für etwas“."
+},
+
+{
+    word: "zuverlässig",
+    example: "Er ist sehr zuverlässig und hält immer seine Versprechen.",
+    answer: "Dapat diandalkan",
+    options: [
+        "Dapat diandalkan",
+        "Pemalu",
+        "Berisik",
+        "Tidak sabar"
+    ],
+    explanation:
+        "„zuverlässig“ beschreibt eine Person oder Sache, auf die man sich verlassen kann.",
+    structure:
+        "Beispiel: „eine zuverlässige Person“."
+}
+
+];
+
+
+/* ==========================================
+   VARIABLES
+========================================== */
+
+let currentIndex = 0;
+let score = 0;
+let streak = 0;
+let answered = false;
+
+
+/* ==========================================
+   LOAD WORD
+========================================== */
+
+function loadWord() {
+
+    const current = vocabulary[currentIndex];
+
+    document.getElementById("word").textContent = current.word;
+
+    document.getElementById("example").textContent =
+        current.example;
+
+    document.getElementById("wordNumber").textContent =
+        currentIndex + 1;
+
+    document.getElementById("progress").style.width =
+        ((currentIndex) / vocabulary.length * 100) + "%";
+
+    document.getElementById("sentenceCard")
+        .classList.add("hidden");
+
+    document.getElementById("feedback")
+        .innerHTML = "";
+
+    document.getElementById("userSentence")
+        .value = "";
+
+    document.getElementById("nextButton")
+        .classList.add("hidden");
+
+    answered = false;
+
+    const optionsContainer =
+        document.getElementById("options");
+
+    optionsContainer.innerHTML = "";
+
+    current.options.forEach(option => {
+
+        const button =
+            document.createElement("button");
+
+        button.className = "option";
+
+        button.textContent = option;
+
+        button.onclick = () =>
+            chooseAnswer(button, option);
+
+        optionsContainer.appendChild(button);
+
+    });
+}
+
+
+/* ==========================================
+   MULTIPLE CHOICE
+========================================== */
+
+function chooseAnswer(button, selected) {
+
+    if (answered) return;
+
+    answered = true;
+
+    const current = vocabulary[currentIndex];
+
+    const allOptions =
+        document.querySelectorAll(".option");
+
+    allOptions.forEach(btn => {
+
+        if (btn.textContent === current.answer) {
+            btn.classList.add("correct");
+        }
+
+        btn.disabled = true;
+
+    });
+
+
+    if (selected === current.answer) {
+
+        button.classList.add("correct");
+
+        score += 10;
+        streak++;
+
+        document.getElementById("score")
+            .textContent = score;
+
+        document.getElementById("streak")
+            .textContent = streak;
+
+    } else {
+
+        button.classList.add("wrong");
+
+        streak = 0;
+
+        document.getElementById("streak")
+            .textContent = streak;
+
+    }
+
+
+    /* SHOW SENTENCE TASK */
+
+    document.getElementById("sentenceWord")
+        .textContent = current.word;
+
+    document.getElementById("sentenceCard")
+        .classList.remove("hidden");
+
+}
+
+
+/* ==========================================
+   SENTENCE CHECKER
+========================================== */
+
+function checkSentence() {
+
+    const sentence =
+        document.getElementById("userSentence")
+        .value
+        .trim();
+
+    const current = vocabulary[currentIndex];
+
+    const feedback =
+        document.getElementById("feedback");
+
+
+    if (sentence.length < 5) {
+
+        feedback.className =
+            "feedback bad";
+
+        feedback.innerHTML = `
+            ❌ <strong>Zu kurz!</strong><br>
+            Versuch, einen vollständigen deutschen Satz zu schreiben.
+        `;
+
+        return;
+    }
+
+
+    const lower =
+        sentence.toLowerCase();
+
+    const wordWithoutArticle =
+        current.word
+        .replace("die ", "")
+        .replace("der ", "")
+        .replace("das ", "");
+
+
+    const containsWord =
+        lower.includes(wordWithoutArticle);
+
+
+    if (!containsWord) {
+
+        feedback.className =
+            "feedback bad";
+
+        feedback.innerHTML = `
+            ❌ <strong>Das Wort fehlt.</strong><br><br>
+
+            Dein Satz sollte das Wort
+            <strong>${current.word}</strong>
+            enthalten.
+        `;
+
+        return;
+    }
+
+
+    /* BASIC SENTENCE ANALYSIS */
+
+    let points = 0;
+    let comments = [];
+
+
+    /* Capital letter */
+
+    if (sentence[0] === sentence[0].toUpperCase()) {
+
+        points++;
+
+        comments.push(
+            "✅ Der Satz beginnt mit einem Großbuchstaben."
+        );
+
+    } else {
+
+        comments.push(
+            "⚠️ Denk an den Großbuchstaben am Satzanfang."
+        );
+
+    }
+
+
+    /* End punctuation */
+
+    if (/[.!?]$/.test(sentence)) {
+
+        points++;
+
+        comments.push(
+            "✅ Gute Zeichensetzung."
+        );
+
+    } else {
+
+        comments.push(
+            "⚠️ Vergiss den Punkt am Ende nicht."
+        );
+
+    }
+
+
+    /* Word placement */
+
+    if (
+        lower.includes(wordWithoutArticle)
+    ) {
+
+        points++;
+
+        comments.push(
+            `✅ Du hast „${current.word}“ verwendet.`
+        );
+
+    }
+
+
+    let grade;
+
+    if (points >= 3) {
+
+        grade = "good";
+
+        score += 5;
+
+        feedback.innerHTML = `
+            <strong>🎉 Sehr gut!</strong><br><br>
+
+            ${comments.join("<br>")}
+
+            <br><br>
+
+            💡 <strong>Bedeutung:</strong><br>
+            ${current.explanation}
+
+            <br><br>
+
+            📌 <strong>Typische Verwendung:</strong><br>
+            ${current.structure}
+
+            <br><br>
+
+            ⭐ +5 Punkte
+        `;
+
+    } else {
+
+        grade = "medium";
+
+        feedback.innerHTML = `
+            <strong>👍 Fast!</strong><br><br>
+
+            ${comments.join("<br>")}
+
+            <br><br>
+
+            💡 <strong>Erklärung:</strong><br>
+            ${current.explanation}
+
+            <br><br>
+
+            📌 <strong>Typische Verwendung:</strong><br>
+            ${current.structure}
+        `;
+
+    }
+
+
+    feedback.className =
+        "feedback " + grade;
+
+
+    document.getElementById("score")
+        .textContent = score;
+
+    document.getElementById("nextButton")
+        .classList.remove("hidden");
+
+}
+
+
+/* ==========================================
+   NEXT WORD
+========================================== */
+
+function nextWord() {
+
+    currentIndex++;
+
+    if (currentIndex >= vocabulary.length) {
+
+        showFinished();
+
+        return;
+    }
+
+    loadWord();
+
+}
+
+
+/* ==========================================
+   FINISH
+========================================== */
+
+function showFinished() {
+
+    document.querySelector(".container")
+        .innerHTML = `
+
+        <div class="card" style="text-align:center; margin-top:60px;">
+
+            <div style="font-size:60px;">
+                🏆
+            </div>
+
+            <h1>
+                Geschafft!
+            </h1>
+
+            <br>
+
+            <p>
+                Du hast alle Wörter abgeschlossen.
+            </p>
+
+            <br>
+
+            <h2>
+                Score: ${score}
+            </h2>
+
+            <br>
+
+            <button
+                class="main-btn"
+                onclick="location.reload()"
+            >
+                🔄 Nochmal spielen
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+
+/* ==========================================
+   START
+========================================== */
+
+loadWord();
+
+</script>
+
+</body>
+          </html>
